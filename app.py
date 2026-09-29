@@ -47,18 +47,16 @@ MODEL_BY_CATEGORY = {
     "TRAFFIC":        {"name": "YOLOv8-Traffic", "version": "1.0.0"},
 }
 
-# Delhi locations (lat, lon, dummy address) - spread far apart
+# Delhi locations (lat, lon, address) - coordinates match the named landmarks
 LOC = {
-    "shahdara":        (28.6735, 77.2890, "Shahdara Flyover, GT Road, Shahdara, Delhi"),
-    "dwarka":          (28.5921, 77.0460, "Sector 10 Main Road, near Dwarka Mor Metro, Delhi"),
-    "rohini":          (28.7495, 77.0565, "Outer Ring Road, near Rohini Sector 18 Crossing, Delhi"),
-    "lajpat_nagar":    (28.5677, 77.2433, "Ring Road, below Lajpat Nagar Flyover, Delhi"),
-    "dme_cut":         (28.6090, 77.2960, "DME Cut No. 3, Delhi-Meerut Expressway, Mayur Vihar, Delhi"),
-    "karol_bagh":      (28.6519, 77.1909, "Pusa Road, near Karol Bagh Metro Station, Delhi"),
-    "nehru_place":     (28.5494, 77.2519, "Nehru Place Flyover, Outer Ring Road, Delhi"),
-    "saket":           (28.5245, 77.2066, "Press Enclave Marg, near Saket District Centre, Delhi"),
-    "chandni_chowk":   (28.6506, 77.2303, "Netaji Subhash Marg, near Red Fort, Chandni Chowk, Delhi"),
-    "vasant_kunj":     (28.5200, 77.1590, "Nelson Mandela Marg, near Vasant Kunj Sector D School, Delhi"),
+    "shahdara":      (28.6735, 77.2890, "Shahdara Flyover, GT Road, Shahdara, Delhi"),
+    "dwarka":        (28.5811, 77.0577, "Sector 10 Main Road, near Dwarka Sector 10 Metro Station, Delhi"),
+    "rohini":        (28.7209, 77.1073, "Outer Ring Road, near Rithala Metro Station, Rohini, Delhi"),
+    "karol_bagh":    (28.6435, 77.1885, "Pusa Road, near Karol Bagh Metro Station, Delhi"),
+    "nehru_place":   (28.5494, 77.2519, "Nehru Place Flyover, Outer Ring Road, Delhi"),
+    "saket":         (28.5284, 77.2192, "Press Enclave Marg, near Saket District Centre, Delhi"),
+    "chandni_chowk": (28.6562, 77.2312, "Chandni Chowk Road, near Town Hall, Old Delhi"),
+    "vasant_kunj":   (28.5300, 77.1560, "Nelson Mandela Marg, near Sector D, Vasant Kunj, Delhi"),
 }
 
 # Cloudinary evidence images (one per clip)
@@ -88,7 +86,6 @@ CLIPS = [
     ]),
     dict(clip=2, start=5, end=10, detections=[
         det("WATERLOGGING", "HIGH",   0.93, 2, "rohini"),
-        det("POTHOLE",      "HIGH",   0.90, 2, "lajpat_nagar"),
     ]),
     dict(clip=3, start=10, end=15, detections=[
         det("MISSING_ZEBRA_CROSSING", "MEDIUM",   0.86, 3, "karol_bagh"),
@@ -231,21 +228,22 @@ if events:
         with st.expander(f"{icon} {name} — {len(sub)} detected", expanded=True):
             c1, c2 = st.columns([1, 1])
             with c1:
-                st.dataframe(
-                    sub[["clip", "time", "severity", "confidence", "address", "lat", "lon", "vehicleNumber"]],
-                    hide_index=True, use_container_width=True)
+                show_cols = ["severity", "confidence", "address", "lat", "lon"]
+                if t == "HIT_AND_RUN":
+                    show_cols.append("vehicleNumber")
+                st.dataframe(sub[show_cols], hide_index=True, use_container_width=True)
                 for e in evs:
                     loc = e["location"]
                     msg = (f"**{name}** detected at **{loc['address']}** "
                            f"({loc['latitude']:.4f}, {loc['longitude']:.4f}) "
-                           f"in clip {e['_clip']} — confidence {e['confidence']:.2f}, "
+                           f"— confidence {e['confidence']:.2f}, "
                            f"severity {e['severity']}.")
                     if e["vehicleNumber"]:
                         msg += f" Vehicle: **{e['vehicleNumber']}**"
                     st.markdown("- " + msg)
             with c2:
                 st.image([e["evidence"]["imageUrl"] for e in evs],
-                         caption=[f"Clip {e['_clip']}" for e in evs], width=260)
+                         caption=[e["location"]["address"] for e in evs], width=260)
             with st.popover("View JSON payload(s)"):
                 for e in evs:
                     st.json(payload_of(e, refresh_time=False))
