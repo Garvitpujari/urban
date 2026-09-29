@@ -86,10 +86,8 @@ CLIPS = [
         det("WATERLOGGING", "HIGH",   0.91, 1, "shahdara"),
         det("POTHOLE",      "MEDIUM", 0.88, 1, "dwarka"),
     ]),
-    dict(clip=2, start=5, end=10, detections=[
-        det("WATERLOGGING", "HIGH",   0.93, 2, "rohini"),
-        det("POTHOLE",      "HIGH",   0.90, 2, "lajpat_nagar"),
-    ]),
+    # Clip 2 (5-10s): intentionally no detections - its image was wrong,
+    # so nothing is displayed or sent to the backend for this clip.
     dict(clip=3, start=10, end=15, detections=[
         det("HIT_AND_RUN",            "CRITICAL", 0.97, 3, "dme_cut", HIT_AND_RUN_PLATE),
         det("MISSING_ZEBRA_CROSSING", "MEDIUM",   0.86, 3, "karol_bagh"),
