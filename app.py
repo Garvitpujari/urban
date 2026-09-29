@@ -50,7 +50,6 @@ MODEL_BY_CATEGORY = {
 # Delhi locations (lat, lon, address) - coordinates match the named landmarks
 LOC = {
     "shahdara":      (28.6735, 77.2890, "Shahdara Flyover, GT Road, Shahdara, Delhi"),
-    "dwarka":        (28.5811, 77.0577, "Sector 10 Main Road, near Dwarka Sector 10 Metro Station, Delhi"),
     "rohini":        (28.7209, 77.1073, "Outer Ring Road, near Rithala Metro Station, Rohini, Delhi"),
     "karol_bagh":    (28.6435, 77.1885, "Pusa Road, near Karol Bagh Metro Station, Delhi"),
     "nehru_place":   (28.5494, 77.2519, "Nehru Place Flyover, Outer Ring Road, Delhi"),
@@ -82,7 +81,7 @@ def det(type_, sev, conf, clip, loc, plate=""):
 CLIPS = [
     dict(clip=1, start=0, end=5, detections=[
         det("WATERLOGGING", "HIGH",   0.91, 1, "shahdara"),
-        det("POTHOLE",      "MEDIUM", 0.88, 1, "dwarka"),
+        det("POTHOLE",      "MEDIUM", 0.88, 1, "shahdara"),
     ]),
     dict(clip=2, start=5, end=10, detections=[
         det("WATERLOGGING", "HIGH",   0.93, 2, "rohini"),
@@ -192,6 +191,8 @@ st.session_state.setdefault("events", None)
 st.session_state.setdefault("results", None)
 
 uploaded = st.file_uploader("Upload video", type=["mp4", "mov", "avi", "mkv"])
+if uploaded:
+    st.video(uploaded)
 
 if uploaded and st.button("🔍 Analyze video", type="primary"):
     src = tempfile.NamedTemporaryFile(delete=False, suffix=os.path.splitext(uploaded.name)[1]).name
